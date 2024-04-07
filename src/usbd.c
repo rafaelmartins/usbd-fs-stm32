@@ -98,7 +98,7 @@ static struct {
 } endpoints[] = {
     {
         .type     = USB_EP_CONTROL,
-        .reg      = (__IO uint16_t*) USB_EP0R,
+        .reg      = (__IO uint16_t*) &(USB->EP0R),
         .pma_in   = (__IO pma_entry_t*) USB_PMAADDR,
         .pma_out  = (__IO pma_entry_t*) (USB_PMAADDR + sizeof(pma_entry_t)),
         .size_in  = USBD_EP0_SIZE,
@@ -108,7 +108,7 @@ static struct {
 #define __endpoint(EPT, TYP)                                                               \
     {                                                                                      \
         .type     = USB_EP_ ## TYP,                                                        \
-        .reg      = (__IOM uint16_t*) USB_EP ## EPT ## R,                                  \
+        .reg      = (__IOM uint16_t*) &(USB->EP ## EPT ## R),                              \
         .pma_in   = (__IOM pma_entry_t*) (USB_PMAADDR + (EPT << 3)),                       \
         .pma_out  = (__IOM pma_entry_t*) (USB_PMAADDR + (EPT << 3) + sizeof(pma_entry_t)), \
         .size_in  = USBD_EP ## EPT ## _IN_SIZE,                                            \
