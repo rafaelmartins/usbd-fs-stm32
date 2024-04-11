@@ -219,8 +219,8 @@ usbd_control_in(const void *buf, uint16_t buflen, uint16_t reqlen)
     uint16_t total = reqlen < buflen ? reqlen : buflen;
     uint16_t l = total > USBD_EP0_SIZE ? USBD_EP0_SIZE : total;
     usbd_in(0, (uint8_t*) buf, l);
-    ctrl_in_buflen = total > USBD_EP0_SIZE ? total - USBD_EP0_SIZE : 0;
     ctrl_in_buf = total > USBD_EP0_SIZE ? buf + USBD_EP0_SIZE : NULL;
+    ctrl_in_buflen = total > USBD_EP0_SIZE ? total - USBD_EP0_SIZE : 0;
 }
 
 static bool
@@ -231,8 +231,8 @@ usbd_control_in_resume(void)
 
     uint16_t l = ctrl_in_buflen > USBD_EP0_SIZE ? USBD_EP0_SIZE : ctrl_in_buflen;
     usbd_in(0, ctrl_in_buf, l);
-    ctrl_in_buflen = ctrl_in_buflen > USBD_EP0_SIZE ? ctrl_in_buflen - USBD_EP0_SIZE : 0;
     ctrl_in_buf = ctrl_in_buflen > USBD_EP0_SIZE ? ctrl_in_buf + USBD_EP0_SIZE : NULL;
+    ctrl_in_buflen = ctrl_in_buflen > USBD_EP0_SIZE ? ctrl_in_buflen - USBD_EP0_SIZE : 0;
     return true;
 }
 
