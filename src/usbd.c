@@ -370,6 +370,8 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
         case STATE_ADDRESS:
             address = (req->wValue & USB_DADDR_ADD);
             set_address = true;
+            if (usbd_set_address_hook_cb)
+                usbd_set_address_hook_cb(address);
             break;
 
         case STATE_CONFIGURED:
@@ -521,21 +523,24 @@ usbd_task(void)
     if (istr & USB_ISTR_WKUP) {
         USB->ISTR &= ~(USB_ISTR_SUSP | USB_ISTR_WKUP);
         USB->CNTR &= ~USB_CNTR_FSUSP;
-        if (usbd_resume_cb)
-            usbd_resume_cb();
+        if (usbd_resume_hook_cb)
+            usbd_resume_hook_cb();
         return;
     }
 
     if (istr & USB_ISTR_SUSP) {
         USB->ISTR &= ~USB_ISTR_SUSP;
         USB->CNTR |= USB_CNTR_FSUSP;
-        if (usbd_suspend_cb)
-            usbd_suspend_cb();
+        if (usbd_suspend_hook_cb)
+            usbd_suspend_hook_cb();
         return;
     }
 
     if (istr & USB_ISTR_RESET) {
         USB->ISTR &= ~USB_ISTR_RESET;
+
+        if (usbd_reset_hook_cb)
+            usbd_reset_hook_cb(true);
 
         for (uint8_t i = 0; i < 8; i++)
             *(endpoints[i].reg) &= ~USB_EPREG_MASK;
@@ -547,6 +552,9 @@ usbd_task(void)
         USB->EP0R |= endpoints[0].type;
         USB->EP0R = (USB->EP0R ^ (USB_EP_RX_VALID | USB_EP_TX_NAK)) &
             (USB_EPREG_MASK | USB_EPRX_STAT | USB_EP_DTOG_RX | USB_EP_DTOG_TX);
+
+        if (usbd_reset_hook_cb)
+            usbd_reset_hook_cb(false);
         return;
     }
 

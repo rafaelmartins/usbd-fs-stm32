@@ -44,8 +44,11 @@ const usb_config_descriptor_t* usbd_get_config_descriptor_cb(void);
 const usb_interface_descriptor_t* usbd_get_interface_descriptor_cb(uint16_t itf);
 const usb_string_descriptor_t* usbd_get_string_descriptor_cb(uint16_t lang, uint8_t idx);
 
-void usbd_suspend_cb(void) __WEAK;
-void usbd_resume_cb(void) __WEAK;
+void usbd_reset_hook_cb(bool before) __WEAK;
+void usbd_set_address_hook_cb(uint8_t addr) __WEAK;
+void usbd_suspend_hook_cb(void) __WEAK;
+void usbd_resume_hook_cb(void) __WEAK;
+
 void usbd_out_cb(uint8_t ept) __WEAK;
 void usbd_in_cb(uint8_t ept) __WEAK;
 
