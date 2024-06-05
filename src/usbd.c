@@ -174,8 +174,8 @@ usbd_in(uint8_t ept, const void *buf, uint16_t buflen)
     if (e->addr == 0)
         return false;
 
-    uint8_t *src = (uint8_t*) buf;
-    uint16_t *dst = (uint16_t*) (USB_PMAADDR + e->addr);
+    const uint8_t *src = buf;
+    __IO uint16_t *dst = (uint16_t*) (USB_PMAADDR + e->addr);
 
     uint16_t tmp;
     for (uint16_t i = 0; i < ((buflen + 1) >> 1); i++) {
