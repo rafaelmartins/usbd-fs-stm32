@@ -98,9 +98,9 @@ static struct {
 } endpoints[] = {
     {
         .type     = USB_EP_CONTROL,
-        .reg      = (__IO uint16_t*) &(USB->EP0R),
-        .pma_in   = (__IO pma_entry_t*) USB_PMAADDR,
-        .pma_out  = (__IO pma_entry_t*) (USB_PMAADDR + sizeof(pma_entry_t)),
+        .reg      = (__IOM uint16_t*) &(USB->EP0R),
+        .pma_in   = (__IOM pma_entry_t*) USB_PMAADDR,
+        .pma_out  = (__IOM pma_entry_t*) (USB_PMAADDR + sizeof(pma_entry_t)),
         .size_in  = USBD_EP0_SIZE,
         .size_out = USBD_EP0_SIZE,
     },
