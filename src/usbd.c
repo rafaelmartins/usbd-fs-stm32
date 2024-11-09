@@ -520,7 +520,9 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
             (state != STATE_CONFIGURED))
             break;
 
-        // no alternate setting supported
+        // no alternate setting supported, but someone may still try to set 0
+        if (req->wIndex == 0 && req->wValue == 0)
+            return true;
         break;
 
     case USB_REQ_SYNCH_FRAME:
