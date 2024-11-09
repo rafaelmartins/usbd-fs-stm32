@@ -349,11 +349,57 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
         return true;
 
     case USB_REQ_CLEAR_FEATURE:
-        // not supported
+        {
+            if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
+                ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_ENDPOINT) ||
+                (req->wValue != USB_FEAT_ENDPOINT_HALT) ||
+                (state != STATE_CONFIGURED))
+                break;
+
+            uint8_t ept = req->wIndex & 0x7;
+            if ((endpoints[ept].type != USB_EP_BULK) && (endpoints[ept].type != USB_EP_INTERRUPT))
+                break;
+
+            if (req->wIndex & USB_DESCR_EPT_ADDR_DIR_IN) {
+                if (endpoints[ept].size_in != 0) {
+                    *(endpoints[ept].reg) = (*(endpoints[ept].reg) ^ USB_EP_TX_NAK) &
+                        (USB_EPREG_MASK | USB_EPTX_STAT | USB_EP_DTOG_TX);
+                    return true;
+                }
+            }
+            else if (endpoints[ept].size_out != 0) {
+                *(endpoints[ept].reg) = (*(endpoints[ept].reg) ^ USB_EP_RX_VALID) &
+                    (USB_EPREG_MASK | USB_EPRX_STAT | USB_EP_DTOG_RX);
+                return true;
+            }
+        }
         break;
 
     case USB_REQ_SET_FEATURE:
-        // not supported
+        {
+            if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
+                ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_ENDPOINT) ||
+                (req->wValue != USB_FEAT_ENDPOINT_HALT) ||
+                (state != STATE_CONFIGURED))
+                break;
+
+            uint8_t ept = req->wIndex & 0x7;
+            if ((endpoints[ept].type != USB_EP_BULK) && (endpoints[ept].type != USB_EP_INTERRUPT))
+                break;
+
+            if (req->wIndex & USB_DESCR_EPT_ADDR_DIR_IN) {
+                if (endpoints[ept].size_in != 0) {
+                    *(endpoints[ept].reg) = (*(endpoints[ept].reg) ^ USB_EP_TX_STALL) &
+                        (USB_EPREG_MASK | USB_EPTX_STAT);
+                    return true;
+                }
+            }
+            else if (endpoints[ept].size_out != 0) {
+                *(endpoints[ept].reg) = (*(endpoints[ept].reg) ^ USB_EP_RX_STALL) &
+                    (USB_EPREG_MASK | USB_EPRX_STAT);
+                return true;
+            }
+        }
         break;
 
     case USB_REQ_SET_ADDRESS:
@@ -378,7 +424,6 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
             break;
         }
 
-        usbd_control_in(NULL, 0, req->wLength);
         return true;
 
     case USB_REQ_GET_DESCRIPTOR:
@@ -452,7 +497,6 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
         else
             break;
 
-        usbd_control_in(NULL, 0, req->wLength);
         return true;
 
     case USB_REQ_GET_INTERFACE:
@@ -567,8 +611,11 @@ usbd_task(void)
 
                 usb_ctrl_request_t req;
                 uint16_t len = usbd_out(0, &req, sizeof(usb_ctrl_request_t));
-                if ((len == sizeof(usb_ctrl_request_t)) && handle_ctrl_setup(&req))
+                if ((len == sizeof(usb_ctrl_request_t)) && handle_ctrl_setup(&req)) {
+                    if ((req.bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_HOST_TO_DEVICE)
+                        usbd_control_in(NULL, 0, req.wLength);
                     return;
+                }
 
                 USB->EP0R = (USB->EP0R ^ USB_EP_TX_STALL) & (USB_EPREG_MASK | USB_EPTX_STAT);
                 USB->EP0R = (USB->EP0R ^ USB_EP_RX_STALL) & (USB_EPREG_MASK | USB_EPRX_STAT);

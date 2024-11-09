@@ -34,6 +34,12 @@
 // Descriptor types
 
 typedef __PACKED_STRUCT {
+    usb_endpoint_descriptor_t endpoint;
+    uint8_t bRefresh;
+    uint8_t bSynchAddress;
+} usb_audio_endpoint_descriptor_t;
+
+typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;

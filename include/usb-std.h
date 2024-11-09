@@ -157,8 +157,6 @@ typedef __PACKED_STRUCT {
     uint8_t bmAttributes;
     uint16_t wMaxPacketSize;
     uint8_t bInterval;
-    uint8_t bRefresh;       // audio endpoints only
-    uint8_t bSynchAddress;  // audio endpoints only
 } usb_endpoint_descriptor_t;
 
 typedef __PACKED_STRUCT {
