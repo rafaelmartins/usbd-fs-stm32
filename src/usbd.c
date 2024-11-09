@@ -513,16 +513,23 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
             usbd_control_in(&(itf->bAlternateSetting), sizeof(itf->bAlternateSetting), req->wLength);
             return true;
         }
+        break;
 
     case USB_REQ_SET_INTERFACE:
-        if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
-            ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_INTERFACE) ||
-            (state != STATE_CONFIGURED))
-            break;
+        {
+            if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
+                ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_INTERFACE) ||
+                (state != STATE_CONFIGURED))
+                break;
 
-        // no alternate setting supported, but someone may still try to set 0
-        if (req->wIndex == 0 && req->wValue == 0)
-            return true;
+            // no alternate setting supported, but someone may still try to re-set
+            const usb_interface_descriptor_t *itf = usbd_get_interface_descriptor_cb(req->wIndex);
+            if (itf == NULL)
+                break;
+
+            if (itf->bAlternateSetting == (uint8_t) req->wValue)
+                return true;
+        }
         break;
 
     case USB_REQ_SYNCH_FRAME:
