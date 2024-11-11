@@ -487,7 +487,7 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
                 *ep |= endpoints[i].type | i;
 
                 if (endpoints[i].size_in != 0)
-                    *ep = (*ep ^ USB_EP_TX_VALID) &
+                    *ep = (*ep ^ USB_EP_TX_NAK) &
                         (USB_EPREG_MASK | USB_EPTX_STAT | USB_EP_DTOG_TX);
                 if (endpoints[i].size_out != 0)
                     *ep = (*ep ^ USB_EP_RX_VALID) &
@@ -561,7 +561,9 @@ usbd_init(void)
     pma_init();
 
     USB->ISTR = 0;
-    USB->CNTR = USB_CNTR_CTRM | USB_CNTR_RESETM | USB_CNTR_WKUPM | USB_CNTR_SUSPM;
+    USB->CNTR = USB_CNTR_CTRM | USB_CNTR_WKUPM | USB_CNTR_SUSPM | USB_CNTR_RESETM;
+    if (usbd_in_cb)
+        USB->CNTR |= USB_CNTR_SOFM;
     USB->BCDR = USB_BCDR_DPPU;
 }
 
@@ -569,7 +571,7 @@ usbd_init(void)
 void
 usbd_task(void)
 {
-    uint16_t istr = USB->ISTR & (USB_ISTR_RESET | USB_ISTR_CTR | USB_ISTR_SUSP | USB_ISTR_WKUP);
+    uint16_t istr = USB->ISTR & (USB_ISTR_CTR | USB_ISTR_WKUP | USB_ISTR_SUSP | USB_ISTR_RESET | USB_ISTR_SOF);
     if (istr == 0)
         return;
 
@@ -611,6 +613,21 @@ usbd_task(void)
         return;
     }
 
+    static uint8_t current_ep = 1;
+    if (usbd_in_cb && (istr & USB_ISTR_SOF)) {
+        USB->ISTR &= ~USB_ISTR_SOF;
+
+        uint8_t ep = current_ep++;
+        if (current_ep >= 8)
+            current_ep = 1;
+
+        if ((endpoints[ep].size_in != 0) &&
+            (((*endpoints[ep].reg) & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | ep))) {
+            usbd_in_cb(ep);
+            return;
+        }
+    }
+
     if (istr & USB_ISTR_CTR) {
         uint8_t ep = USB->ISTR & USB_ISTR_EP_ID;
 
@@ -650,11 +667,8 @@ usbd_task(void)
             if (usbd_out_cb)
                 usbd_out_cb(ep);
         }
-        if (*(endpoints[ep].reg) & USB_EP_CTR_TX) {
+        if (*(endpoints[ep].reg) & USB_EP_CTR_TX)
             *(endpoints[ep].reg) &= USB_EPREG_MASK ^ USB_EP_CTR_TX;
-            if (usbd_in_cb)
-                usbd_in_cb(ep);
-        }
     }
 }
 
