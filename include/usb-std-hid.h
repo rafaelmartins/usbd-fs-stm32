@@ -5,13 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/**
+ * @file usb-std-hid.h
+ * @brief Basic USB HID descriptors header.
+ *
+ * This header defines some macros and types to help define the basic USB
+ * HID descriptors.
+ */
+
 #pragma once
 
 #include <stdint.h>
 #include <usbd.h>
 
-
-// Descriptor macros
+/**
+ * @name USB HID descriptor macros.
+ *
+ * Macros to help defining the basic USB HID descriptors.
+ *
+ * @{
+ */
 
 #define USB_REQ_HID_GET_REPORT    0x01
 #define USB_REQ_HID_GET_IDLE      0x02
@@ -24,9 +37,13 @@
 #define USB_DESCR_TYPE_HID_REPORT 0x22
 #define USB_DESCR_TYPE_HID_PHYS   0x23
 
+/**
+ * @}
+ */
 
-// Descriptor types
-
+/**
+ * @brief USB HID descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;

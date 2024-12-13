@@ -5,13 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/**
+ * @file usb-std.h
+ * @brief USB basic standard descriptors header.
+ *
+ * This header defines some macros and types to help define the basic standard
+ * USB descriptors.
+ */
+
 #pragma once
 
 #include <stdint.h>
 #include <usbd.h>
 
-
-// Request (Setup) data macros
+/**
+ * @name USB control request (setup) data macros.
+ *
+ * Macros to help with bitwise comparision of SETUP request packets.
+ *
+ * @{
+ */
 
 #define USB_REQ_DIR_HOST_TO_DEVICE (0 << 7)
 #define USB_REQ_DIR_DEVICE_TO_HOST (1 << 7)
@@ -40,8 +53,18 @@
 #define USB_REQ_SET_INTERFACE     0x0b
 #define USB_REQ_SYNCH_FRAME       0x0c
 
+/**
+ * @}
+ */
 
-// Descriptor macros
+
+/**
+ * @name USB descriptor macros.
+ *
+ * Macros to help defining the basic standard USB descriptors.
+ *
+ * @{
+ */
 
 #define USB_DESCR_TYPE_DEVICE                    0x01
 #define USB_DESCR_TYPE_CONFIGURATION             0x02
@@ -94,16 +117,28 @@
 #define USB_DESCR_EPT_ATTR_FEEDBACK               (1 << 2)
 #define USB_DESCR_EPT_ATTR_IMPLICIT_FEEDBACK_DATA (2 << 2)
 
+#define USB_DESCR_FEAT_ENDPOINT_HALT        0x00
+#define USB_DESCR_FEAT_DEVICE_REMOTE_WAKEUP 0x01
+#define USB_DESCR_FEAT_TEST_MODE            0x02
 
-// Feature selector macros
+/**
+ * @}
+ */
 
-#define USB_FEAT_ENDPOINT_HALT        0x00
-#define USB_FEAT_DEVICE_REMOTE_WAKEUP 0x01
-#define USB_FEAT_TEST_MODE            0x02
+/**
+ * @brief USB control request (setup) type.
+ */
+typedef __PACKED_STRUCT {
+    uint8_t bmRequestType;
+    uint8_t bRequest;
+    uint16_t wValue;
+    uint16_t wIndex;
+    uint16_t wLength;
+} usb_ctrl_request_t;
 
-
-// Descriptor types
-
+/**
+ * @brief USB device descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -121,6 +156,9 @@ typedef __PACKED_STRUCT {
     uint8_t bNumConfigurations;
 } usb_device_descriptor_t;
 
+/**
+ * @brief USB configuration descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -132,12 +170,18 @@ typedef __PACKED_STRUCT {
     uint8_t bMaxPower;
 } usb_config_descriptor_t;
 
+/**
+ * @brief USB string descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t wData[];
 } usb_string_descriptor_t;
 
+/**
+ * @brief USB interface descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -150,6 +194,9 @@ typedef __PACKED_STRUCT {
     uint8_t iInterface;
 } usb_interface_descriptor_t;
 
+/**
+ * @brief USB endpoint descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -158,11 +205,3 @@ typedef __PACKED_STRUCT {
     uint16_t wMaxPacketSize;
     uint8_t bInterval;
 } usb_endpoint_descriptor_t;
-
-typedef __PACKED_STRUCT {
-    uint8_t bmRequestType;
-    uint8_t bRequest;
-    uint16_t wValue;
-    uint16_t wIndex;
-    uint16_t wLength;
-} usb_ctrl_request_t;

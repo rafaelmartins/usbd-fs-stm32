@@ -5,13 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/**
+ * @file usb-std-audio.h
+ * @brief USB basic audio-related descriptors header.
+ *
+ * This header defines some macros and types to help define the basic audio-related
+ * USB descriptors.
+ */
+
 #pragma once
 
 #include <stdint.h>
 #include <usbd.h>
 
-
-// Descriptor macros
+/**
+ * @name USB audio descriptor macros.
+ *
+ * Macros to help defining the basic audio-related USB descriptors.
+ *
+ * @{
+ */
 
 #define USB_AUDIO_DESCR_UAC_VERSION_1 0x00
 #define USB_AUDIO_DESCR_UAC_VERSION_2 0x20
@@ -30,9 +43,13 @@
 #define USB_AUDIO_DESCR_SUBTYPE_UAC1_PROCESSING_UNIT 0x07
 #define USB_AUDIO_DESCR_SUBTYPE_UAC1_EXTENSION_UNIT  0x08
 
+/**
+ * @}
+ */
 
-// Descriptor types
-
+/**
+ * @brief USB audio endpoint descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -44,6 +61,9 @@ typedef __PACKED_STRUCT {
     uint8_t bSynchAddress;
 } usb_audio_endpoint_descriptor_t;
 
+/**
+ * @brief USB audio control header type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;

@@ -5,13 +5,26 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/**
+ * @file usb-std-midi.h
+ * @brief USB basic MIDI-related descriptors header.
+ *
+ * This header defines some macros and types to help define the basic MIDI-related
+ * USB descriptors.
+ */
+
 #pragma once
 
 #include <stdint.h>
 #include <usbd.h>
 
-
-// Descriptor macros
+/**
+ * @name USB MIDI descriptor macros.
+ *
+ * Macros to help defining the basic MIDI-related USB descriptors.
+ *
+ * @{
+ */
 
 #define USB_MIDI_DESCR_SUBTYPE_MS_HEADER        0x01
 #define USB_MIDI_DESCR_SUBTYPE_MS_MIDI_IN_JACK  0x02
@@ -23,9 +36,13 @@
 #define USB_MIDI_DESCR_JACK_TYPE_MS_EMBEDDED 0x01
 #define USB_MIDI_DESCR_JACK_TYPE_MS_EXTERNAL 0x02
 
+/**
+ * @}
+ */
 
-// Descriptor types
-
+/**
+ * @brief USB MIDI streaming header type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -34,6 +51,9 @@ typedef __PACKED_STRUCT {
     uint16_t wTotalLength;
 } usb_midi_streaming_header_t;
 
+/**
+ * @brief USB MIDI streaming input jack type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -43,6 +63,9 @@ typedef __PACKED_STRUCT {
     uint8_t iJack;
 } usb_midi_streaming_in_jack_t;
 
+/**
+ * @brief USB MIDI streaming output jack type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
@@ -55,6 +78,9 @@ typedef __PACKED_STRUCT {
     uint8_t iJack;
 } usb_midi_streaming_out_jack_t;
 
+/**
+ * @brief USB MIDI streaming endpoint descriptor type.
+ */
 typedef __PACKED_STRUCT {
     uint8_t bLength;
     uint8_t bDescriptorType;
