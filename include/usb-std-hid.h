@@ -19,7 +19,7 @@
 #include <usbd.h>
 
 /**
- * @name USB HID descriptor macros.
+ * @name USB HID descriptor macros
  *
  * Macros to help defining the basic USB HID descriptors.
  *
@@ -42,7 +42,7 @@
  */
 
 /**
- * @name USB HID descriptor data types.
+ * @name USB HID descriptor data types
  *
  * Data types to help defining the basic USB HID descriptors.
  *

@@ -141,7 +141,7 @@ void usbd_control_in(const void *buf, uint16_t buflen, uint16_t reqlen);
 const usb_device_descriptor_t* usbd_get_device_descriptor_cb(void);
 
 /**
- * @brief Required allback to define USB configuration descriptor.
+ * @brief Required callback to define USB configuration descriptor.
  * @returns A reference to a constant @ref usb_config_descriptor_t.
  *
  * @warning The library supports @b only @b one configuration. That is why the

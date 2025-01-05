@@ -19,7 +19,7 @@
 #include <usbd.h>
 
 /**
- * @name USB MIDI descriptor macros.
+ * @name USB MIDI descriptor macros
  *
  * Macros to help defining the basic MIDI-related USB descriptors.
  *
@@ -41,7 +41,7 @@
  */
 
 /**
- * @name USB MIDI descriptor data types.
+ * @name USB MIDI descriptor data types
  *
  * Data typeds to help defining the basic MIDI-related USB descriptors.
  *

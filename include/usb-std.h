@@ -19,7 +19,7 @@
 #include <usbd.h>
 
 /**
- * @name USB control request (setup) data macros.
+ * @name USB control request (setup) data macros
  *
  * Macros to help with bitwise comparision of SETUP request packets.
  *
@@ -59,7 +59,7 @@
 
 
 /**
- * @name USB descriptor macros.
+ * @name USB descriptor macros
  *
  * Macros to help defining the basic standard USB descriptors.
  *
@@ -126,7 +126,7 @@
  */
 
 /**
- * @name USB descriptor data types.
+ * @name USB descriptor data types
  *
  * Data types to help defining the basic standard USB descriptors.
  *

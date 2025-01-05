@@ -19,7 +19,7 @@
 #include <usbd.h>
 
 /**
- * @name USB audio descriptor macros.
+ * @name USB audio descriptor macros
  *
  * Macros to help defining the basic audio-related USB descriptors.
  *
@@ -48,7 +48,7 @@
  */
 
 /**
- * @name USB audio descriptor data types.
+ * @name USB audio descriptor data types
  *
  * Data types to help defining the basic audio-related USB descriptors.
  *
