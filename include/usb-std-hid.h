@@ -42,9 +42,17 @@
  */
 
 /**
+ * @name USB HID descriptor data types.
+ *
+ * Data types to help defining the basic USB HID descriptors.
+ *
+ * @{
+ */
+
+/**
  * @brief USB HID descriptor type.
  */
-typedef __PACKED_STRUCT {
+typedef struct __attribute__((packed)) {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint16_t bcdHID;
@@ -53,3 +61,7 @@ typedef __PACKED_STRUCT {
     uint8_t bDescriptorType2;
     uint16_t wDescriptorLength;
 } usb_hid_descriptor_t;
+
+/**
+ * @}
+ */

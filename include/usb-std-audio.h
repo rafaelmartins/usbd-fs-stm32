@@ -48,28 +48,40 @@
  */
 
 /**
+ * @name USB audio descriptor data types.
+ *
+ * Data types to help defining the basic audio-related USB descriptors.
+ *
+ * @{
+ */
+
+/**
  * @brief USB audio endpoint descriptor type.
  */
-typedef __PACKED_STRUCT {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    uint8_t bEndpointAddress;
-    uint8_t bmAttributes;
+typedef struct __attribute__((packed)) {
+    uint8_t  bLength;
+    uint8_t  bDescriptorType;
+    uint8_t  bEndpointAddress;
+    uint8_t  bmAttributes;
     uint16_t wMaxPacketSize;
-    uint8_t bInterval;
-    uint8_t bRefresh;
-    uint8_t bSynchAddress;
+    uint8_t  bInterval;
+    uint8_t  bRefresh;
+    uint8_t  bSynchAddress;
 } usb_audio_endpoint_descriptor_t;
 
 /**
  * @brief USB audio control header type.
  */
-typedef __PACKED_STRUCT {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    uint8_t bDescriptorSubtype;
+typedef struct __attribute__((packed)) {
+    uint8_t  bLength;
+    uint8_t  bDescriptorType;
+    uint8_t  bDescriptorSubtype;
     uint16_t bcdADC;
     uint16_t wTotalLength;
-    uint8_t bInCollection;
-    uint8_t baInterfaceNr;
+    uint8_t  bInCollection;
+    uint8_t  baInterfaceNr;
 } usb_audio_ctrl_header_t;
+
+/**
+ * @}
+ */

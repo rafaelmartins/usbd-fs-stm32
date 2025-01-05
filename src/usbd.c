@@ -11,6 +11,20 @@
 
 #include <usbd.h>
 
+#if defined(STM32F0) || defined(STM32F0xx)
+#include <stm32f0xx.h>
+#define USB_COUNT0_RX_BLSIZE        (0x1UL << (15U))
+#define USB_COUNT1_RX_0_COUNT1_RX_0 (0x000003FFU)
+#elif defined(STM32G4) || defined(STM32G4xx)
+#include <stm32g4xx.h>
+#else
+#error "Unsupported STM32 series"
+#endif
+
+#ifndef USB
+#error "No supported USB device available"
+#endif
+
 #ifndef USBD_EP1_IN_SIZE
 #define USBD_EP1_IN_SIZE 0
 #endif

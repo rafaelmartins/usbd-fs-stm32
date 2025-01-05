@@ -41,12 +41,20 @@
  */
 
 /**
+ * @name USB MIDI descriptor data types.
+ *
+ * Data typeds to help defining the basic MIDI-related USB descriptors.
+ *
+ * @{
+ */
+
+/**
  * @brief USB MIDI streaming header type.
  */
-typedef __PACKED_STRUCT {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
-    uint8_t bDescriptorSubtype;
+typedef struct __attribute__((packed)) {
+    uint8_t  bLength;
+    uint8_t  bDescriptorType;
+    uint8_t  bDescriptorSubtype;
     uint16_t bcdMSC;
     uint16_t wTotalLength;
 } usb_midi_streaming_header_t;
@@ -54,7 +62,7 @@ typedef __PACKED_STRUCT {
 /**
  * @brief USB MIDI streaming input jack type.
  */
-typedef __PACKED_STRUCT {
+typedef struct __attribute__((packed)) {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -66,7 +74,7 @@ typedef __PACKED_STRUCT {
 /**
  * @brief USB MIDI streaming output jack type.
  */
-typedef __PACKED_STRUCT {
+typedef struct __attribute__((packed)) {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
@@ -81,10 +89,14 @@ typedef __PACKED_STRUCT {
 /**
  * @brief USB MIDI streaming endpoint descriptor type.
  */
-typedef __PACKED_STRUCT {
+typedef struct __attribute__((packed)) {
     uint8_t bLength;
     uint8_t bDescriptorType;
     uint8_t bDescriptorSubtype;
     uint8_t bNumEmbMIDIJack;
     uint8_t baAssocJackID;
 } usb_midi_streaming_endpoint_descriptor_t;
+
+/**
+ * @}
+ */

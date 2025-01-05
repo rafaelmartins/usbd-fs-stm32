@@ -16,21 +16,7 @@
 #pragma once
 
 #include <stdbool.h>
-
-#if defined(STM32F0) || defined(STM32F0xx)
-#include <stm32f0xx.h>
-#define USB_COUNT0_RX_BLSIZE        (0x1UL << (15U))
-#define USB_COUNT1_RX_0_COUNT1_RX_0 (0x000003FFU)
-#elif defined(STM32G4) || defined(STM32G4xx)
-#include <stm32g4xx.h>
-#else
-#error "Unsupported STM32 series"
-#endif
-
-#ifndef USB
-#error "No supported USB device available"
-#endif
-
+#include <stdint.h>
 #include <usb-std.h>
 
 /**
@@ -184,7 +170,7 @@ const usb_string_descriptor_t* usbd_get_string_descriptor_cb(uint16_t lang, uint
  * @param[in] before Notifies if the callback called before or after the device was reset
  *                  (the callback is called in both situations).
  */
-void usbd_reset_hook_cb(bool before) __WEAK;
+void usbd_reset_hook_cb(bool before) __attribute__((weak));
 
 /**
  * @brief Optional hook callback for USB SET_ADDRESS control requests.
@@ -193,7 +179,7 @@ void usbd_reset_hook_cb(bool before) __WEAK;
  * Setting the address is the last step of the device enumeration process. The device can
  * be considered enumerated when this hook is called.
  */
-void usbd_set_address_hook_cb(uint8_t addr) __WEAK;
+void usbd_set_address_hook_cb(uint8_t addr) __attribute__((weak));
 
 /**
  * @brief Optional hook callback for USB SUSPEND requests.
@@ -202,7 +188,7 @@ void usbd_set_address_hook_cb(uint8_t addr) __WEAK;
  * of the device during suspension. The library will enable the internal STM32 low power mode
  * automatically, but that only reduces the consumption of the USB peripheral itself.
  */
-void usbd_suspend_hook_cb(void) __WEAK;
+void usbd_suspend_hook_cb(void) __attribute__((weak));
 
 /**
  * @brief Optional hook callback for USB RESUME requests.
@@ -211,37 +197,37 @@ void usbd_suspend_hook_cb(void) __WEAK;
  * the device entered suspension. The library will dis]able the internal STM32 low power mode
  * automatically.
  */
-void usbd_resume_hook_cb(void) __WEAK;
+void usbd_resume_hook_cb(void) __attribute__((weak));
 
 /**
  * @brief Optional callback for USB OUT requests.
  * @param[in] ept Endpoint number.
  */
-void usbd_out_cb(uint8_t ept) __WEAK;
+void usbd_out_cb(uint8_t ept) __attribute__((weak));
 
 /**
  * @brief Optional callback for USB IN requests.
  * @param[in] ept Endpoint number.
  */
-void usbd_in_cb(uint8_t ept) __WEAK;
+void usbd_in_cb(uint8_t ept) __attribute__((weak));
 
 /**
  * @brief Optional callback for USB CONTROL class requests.
  * @param[in] req A reference to a @ref usb_ctrl_request_t.
  */
-bool usbd_ctrl_request_handle_class_cb(usb_ctrl_request_t *req) __WEAK;
+bool usbd_ctrl_request_handle_class_cb(usb_ctrl_request_t *req) __attribute__((weak));
 
 /**
  * @brief Optional callback for USB CONTROL vendor requests.
  * @param[in] req A reference to a @ref usb_ctrl_request_t.
  */
-bool usbd_ctrl_request_handle_vendor_cb(usb_ctrl_request_t *req) __WEAK;
+bool usbd_ctrl_request_handle_vendor_cb(usb_ctrl_request_t *req) __attribute__((weak));
 
 /**
  * @brief Optional callback for USB CONTROL GET_DESCRIPTOR INTERFACE requests.
  * @param[in] req A reference to a @ref usb_ctrl_request_t.
  */
-bool usbd_ctrl_request_get_descriptor_interface_cb(usb_ctrl_request_t *req) __WEAK;
+bool usbd_ctrl_request_get_descriptor_interface_cb(usb_ctrl_request_t *req) __attribute__((weak));
 
 /**
  * @}
