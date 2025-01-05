@@ -60,7 +60,7 @@ void usbd_task(void);
 
 /**
  * @brief Generate USB string descriptor from internal STM32 serial number.
- * @returns A reference to an internally managed @ref usb_string_description_t.
+ * @returns A reference to an internally managed @ref usb_string_descriptor_t.
  *
  * Function that generates a USB string descriptor based on the internal
  * serial number inserted by ST during the manufacturing.
