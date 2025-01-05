@@ -19,28 +19,6 @@
 #include <usbd.h>
 
 /**
- * @name USB MIDI descriptor macros
- *
- * Macros to help defining the basic MIDI-related USB descriptors.
- *
- * @{
- */
-
-#define USB_MIDI_DESCR_SUBTYPE_MS_HEADER        0x01
-#define USB_MIDI_DESCR_SUBTYPE_MS_MIDI_IN_JACK  0x02
-#define USB_MIDI_DESCR_SUBTYPE_MS_MIDI_OUT_JACK 0x03
-#define USB_MIDI_DESCR_SUBTYPE_MS_ELEMENT       0x04
-
-#define USB_MIDI_DESCR_EPT_SUBTYPE_MS_GENERAL 0x01
-
-#define USB_MIDI_DESCR_JACK_TYPE_MS_EMBEDDED 0x01
-#define USB_MIDI_DESCR_JACK_TYPE_MS_EXTERNAL 0x02
-
-/**
- * @}
- */
-
-/**
  * @name USB MIDI descriptor data types
  *
  * Data typeds to help defining the basic MIDI-related USB descriptors.
@@ -96,6 +74,28 @@ typedef struct __attribute__((packed)) {
     uint8_t bNumEmbMIDIJack;
     uint8_t baAssocJackID;
 } usb_midi_streaming_endpoint_descriptor_t;
+
+/**
+ * @}
+ */
+
+/**
+ * @name USB MIDI descriptor macros
+ *
+ * Macros to help defining the basic MIDI-related USB descriptors.
+ *
+ * @{
+ */
+
+#define USB_MIDI_DESCR_SUBTYPE_MS_HEADER        0x01
+#define USB_MIDI_DESCR_SUBTYPE_MS_MIDI_IN_JACK  0x02
+#define USB_MIDI_DESCR_SUBTYPE_MS_MIDI_OUT_JACK 0x03
+#define USB_MIDI_DESCR_SUBTYPE_MS_ELEMENT       0x04
+
+#define USB_MIDI_DESCR_EPT_SUBTYPE_MS_GENERAL 0x01
+
+#define USB_MIDI_DESCR_JACK_TYPE_MS_EMBEDDED 0x01
+#define USB_MIDI_DESCR_JACK_TYPE_MS_EXTERNAL 0x02
 
 /**
  * @}

@@ -7,7 +7,7 @@
 
 /**
  * @file usbd.h
- * @brief Main usbd-fs-stm32 header.
+ * @brief Main @c usbd-fs-stm32 header.
  *
  * This header defines the main functions and callbacks implemented by the @c usbd-fs-stm32
  * library.
@@ -159,16 +159,14 @@ const usb_interface_descriptor_t* usbd_get_interface_descriptor_cb(uint16_t itf)
 /**
  * @brief Required callback to define USB string descriptor.
  * @param[in] lang The 16 bits identifier of the requested language.
- * @param[in] idx  The index of the string descriptor to be returned, as defined in the
- *                 descriptor.
+ * @param[in] idx  The index of the string descriptor to be returned, as defined in the descriptor.
  * @returns A reference to a constant @ref usb_string_descriptor_t.
  */
 const usb_string_descriptor_t* usbd_get_string_descriptor_cb(uint16_t lang, uint8_t idx);
 
 /**
  * @brief Optional hook callback for USB RESET requests.
- * @param[in] before Notifies if the callback called before or after the device was reset
- *                  (the callback is called in both situations).
+ * @param[in] before Notifies if the callback call is happening before or after the device reset.
  */
 void usbd_reset_hook_cb(bool before) __attribute__((weak));
 

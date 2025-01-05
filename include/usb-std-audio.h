@@ -19,35 +19,6 @@
 #include <usbd.h>
 
 /**
- * @name USB audio descriptor macros
- *
- * Macros to help defining the basic audio-related USB descriptors.
- *
- * @{
- */
-
-#define USB_AUDIO_DESCR_UAC_VERSION_1 0x00
-#define USB_AUDIO_DESCR_UAC_VERSION_2 0x20
-#define USB_AUDIO_DESCR_UAC_VERSION_3 0x30
-
-#define USB_AUDIO_DESCR_DEV_SUBCLASS_AUDIOCONTROL   0x01
-#define USB_AUDIO_DESCR_DEV_SUBCLASS_AUDIOSTREAMING 0x02
-#define USB_AUDIO_DESCR_DEV_SUBCLASS_MIDISTREAMING  0x03
-
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_HEADER           0x01
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_INPUT_TERMINAL   0x02
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_OUTPUT_TERMINAL  0x03
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_MIXER_UNIT       0x04
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_SELECTOR_UNIT0   0x05
-#define USB_AUDIO_DESCR_SUBTYPE_UAC_FEATURE_UNIT     0x06
-#define USB_AUDIO_DESCR_SUBTYPE_UAC1_PROCESSING_UNIT 0x07
-#define USB_AUDIO_DESCR_SUBTYPE_UAC1_EXTENSION_UNIT  0x08
-
-/**
- * @}
- */
-
-/**
  * @name USB audio descriptor data types
  *
  * Data types to help defining the basic audio-related USB descriptors.
@@ -81,6 +52,35 @@ typedef struct __attribute__((packed)) {
     uint8_t  bInCollection;
     uint8_t  baInterfaceNr;
 } usb_audio_ctrl_header_t;
+
+/**
+ * @}
+ */
+
+/**
+ * @name USB audio descriptor macros
+ *
+ * Macros to help defining the basic audio-related USB descriptors.
+ *
+ * @{
+ */
+
+#define USB_AUDIO_DESCR_UAC_VERSION_1 0x00
+#define USB_AUDIO_DESCR_UAC_VERSION_2 0x20
+#define USB_AUDIO_DESCR_UAC_VERSION_3 0x30
+
+#define USB_AUDIO_DESCR_DEV_SUBCLASS_AUDIOCONTROL   0x01
+#define USB_AUDIO_DESCR_DEV_SUBCLASS_AUDIOSTREAMING 0x02
+#define USB_AUDIO_DESCR_DEV_SUBCLASS_MIDISTREAMING  0x03
+
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_HEADER           0x01
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_INPUT_TERMINAL   0x02
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_OUTPUT_TERMINAL  0x03
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_MIXER_UNIT       0x04
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_SELECTOR_UNIT0   0x05
+#define USB_AUDIO_DESCR_SUBTYPE_UAC_FEATURE_UNIT     0x06
+#define USB_AUDIO_DESCR_SUBTYPE_UAC1_PROCESSING_UNIT 0x07
+#define USB_AUDIO_DESCR_SUBTYPE_UAC1_EXTENSION_UNIT  0x08
 
 /**
  * @}

@@ -19,29 +19,6 @@
 #include <usbd.h>
 
 /**
- * @name USB HID descriptor macros
- *
- * Macros to help defining the basic USB HID descriptors.
- *
- * @{
- */
-
-#define USB_REQ_HID_GET_REPORT    0x01
-#define USB_REQ_HID_GET_IDLE      0x02
-#define USB_REQ_HID_GET_PROTOCOL  0x03
-#define USB_REQ_HID_SET_REPORT    0x09
-#define USB_REQ_HID_SET_IDLE      0x0a
-#define USB_REQ_HID_SET_PROTOCOL  0x0b
-
-#define USB_DESCR_TYPE_HID        0x21
-#define USB_DESCR_TYPE_HID_REPORT 0x22
-#define USB_DESCR_TYPE_HID_PHYS   0x23
-
-/**
- * @}
- */
-
-/**
  * @name USB HID descriptor data types
  *
  * Data types to help defining the basic USB HID descriptors.
@@ -61,6 +38,29 @@ typedef struct __attribute__((packed)) {
     uint8_t bDescriptorType2;
     uint16_t wDescriptorLength;
 } usb_hid_descriptor_t;
+
+/**
+ * @}
+ */
+
+/**
+ * @name USB HID descriptor macros
+ *
+ * Macros to help defining the basic USB HID descriptors.
+ *
+ * @{
+ */
+
+#define USB_REQ_HID_GET_REPORT    0x01
+#define USB_REQ_HID_GET_IDLE      0x02
+#define USB_REQ_HID_GET_PROTOCOL  0x03
+#define USB_REQ_HID_SET_REPORT    0x09
+#define USB_REQ_HID_SET_IDLE      0x0a
+#define USB_REQ_HID_SET_PROTOCOL  0x0b
+
+#define USB_DESCR_TYPE_HID        0x21
+#define USB_DESCR_TYPE_HID_REPORT 0x22
+#define USB_DESCR_TYPE_HID_PHYS   0x23
 
 /**
  * @}
