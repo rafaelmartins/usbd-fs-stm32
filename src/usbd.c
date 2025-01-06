@@ -366,7 +366,7 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
         {
             if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
                 ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_ENDPOINT) ||
-                (req->wValue != USB_FEAT_ENDPOINT_HALT) ||
+                (req->wValue != USB_DESCR_FEAT_ENDPOINT_HALT) ||
                 (state != STATE_CONFIGURED))
                 break;
 
@@ -393,7 +393,7 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
         {
             if (((req->bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_DEVICE_TO_HOST) ||
                 ((req->bmRequestType & USB_REQ_RCPT_MASK) != USB_REQ_RCPT_ENDPOINT) ||
-                (req->wValue != USB_FEAT_ENDPOINT_HALT) ||
+                (req->wValue != USB_DESCR_FEAT_ENDPOINT_HALT) ||
                 (state != STATE_CONFIGURED))
                 break;
 
