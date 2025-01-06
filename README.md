@@ -23,9 +23,10 @@ A lightweight (and very opinionated) USB FS device stack for STM32.
 
 ## How to use
 
-TODO
-
-
-## API documentation
+[API documentation](https://rafaelmartins.eng.br/p/usbd-fs-stm32/api/)
 
 TODO
+
+
+## License
+This code is released under a [BSD 3-Clause License](LICENSE).
