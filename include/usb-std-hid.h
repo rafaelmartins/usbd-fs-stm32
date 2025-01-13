@@ -30,12 +30,12 @@
  * @brief USB HID descriptor type.
  */
 typedef struct __attribute__((packed)) {
-    uint8_t bLength;
-    uint8_t bDescriptorType;
+    uint8_t  bLength;
+    uint8_t  bDescriptorType;
     uint16_t bcdHID;
-    uint8_t bCountryCode;
-    uint8_t bNumDescriptors;
-    uint8_t bDescriptorType2;
+    uint8_t  bCountryCode;
+    uint8_t  bNumDescriptors;
+    uint8_t  bDescriptorType2;
     uint16_t wDescriptorLength;
 } usb_hid_descriptor_t;
 
