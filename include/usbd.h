@@ -31,7 +31,8 @@
 
 /**
  * @name Public API
- * Functions to be called by the user when implementing interactions with the host.
+ * Functions to be called by library consumers when implementing USB device
+ * firmware.
  *
  * @{
  */
@@ -42,8 +43,7 @@
  * Function that initializes the USB peripheral, including the internal memory
  * buffers.
  *
- * This function must be called during firmware initialization, before entering
- * the firmware main loop.
+ * This function must be called during firmware initialization, before entering the firmware main loop.
  */
 void usbd_init(void);
 
@@ -53,21 +53,21 @@ void usbd_init(void);
  * Function that runs all the operations related to the USB peripheral.
  *
  * This function must be called periodically from the firmware main loop
- * or from the IRQ handler @c USB_IRQHandler (make sure to initialize the
- * handler properly).
+ * or from the USB IRQ handler (make sure to initialize the handler function
+ * properly).
  */
 void usbd_task(void);
 
 /**
- * @brief Generate USB string descriptor from internal STM32 serial number.
+ * @brief Generate USB string descriptor from the internal STM32 serial number.
  * @returns A reference to an internally managed @ref usb_string_descriptor_t.
  *
  * Function that generates a USB string descriptor based on the internal
- * serial number inserted by ST during the manufacturing.
+ * serial number inserted by ST during manufacturing.
  *
- * It should be called from @ref usbd_get_string_descriptor_cb, when handling
- * the request for a string descriptor with the index @c iSerialNumber, as set
- * in the device descriptor.
+ * It should be called from the @ref usbd_get_string_descriptor_cb when handling
+ * the request for a string descriptor with the index @c iSerialNumber, as
+ * defined by the device descriptor.
  */
 const usb_string_descriptor_t* usbd_serial_internal_string_descriptor(void);
 
@@ -78,13 +78,13 @@ const usb_string_descriptor_t* usbd_serial_internal_string_descriptor(void);
  * @param[in] buflen Size of the @c buf buffer, in bytes.
  * @returns A boolean indicating that the data was successfully scheduled for transmission.
  *
- * The buffer should not exceed the size of the endpoint, as described in the
+ * The buffer should not exceed the size of the endpoint, as defined by the
  * endpoint descriptor via @ref usb_endpoint_descriptor_t. To send larger chunks
- * of data, the caller must split the data and call the function multiple times, in
+ * of data the caller must split the data and call the function multiple times in
  * response to multiple IN requests.
  *
  * Usually if the final chunk of data sent has the same size of the endpoint buffer,
- * a zero length packet must be also transmitted to the host, to inform it that
+ * a zero length packet must be also transmitted to the host, to inform that the
  * transmission is complete. This is NOT handled automatically by the library.
  */
 bool usbd_in(uint8_t ept, const void *buf, uint16_t buflen);
@@ -96,14 +96,14 @@ bool usbd_in(uint8_t ept, const void *buf, uint16_t buflen);
  * @param[in]  buflen Size of the @c buf buffer, in bytes.
  * @returns The number of bytes received from the host.
  *
- * The buffer should not exceed the size of the endpoint, as described in the
- * endpoint descriptor via @ref usb_endpoint_descriptor_t. Ideally, it should be at
+ * The buffer should not exceed the size of the endpoint, as defined by the
+ * endpoint descriptor via @ref usb_endpoint_descriptor_t. Ideally it should be at
  * least the same size of the endpoint.
  *
- * Usually the firmware should continue accepting USB OUT requests and receiving the
+ * Usually the firmware should continue accepting USB OUT requests and receive the
  * data by calling this function while the number of bytes received is equal to the
  * endpoint size. When the number of bytes received is smaller than then endpoint
- * size, the reception is completed. This is NOT handled automatically by the library.
+ * size the reception is completed. This is NOT handled automatically by the library.
  */
 uint16_t usbd_out(uint8_t ept, void *buf, uint16_t buflen);
 
@@ -113,8 +113,8 @@ uint16_t usbd_out(uint8_t ept, void *buf, uint16_t buflen);
  * @param[in] buflen Size of the @c buf buffer, in bytes.
  * @param[in] reqlen Size of the CONTROL USB IN request data.
  *
- * The buffer may exceed the size of the endpoint 0 (64 bytes), because the function
- * will handle the transmission of the whole buffer automatically.
+ * The buffer may exceed the size of the endpoint 0 (64 bytes). The function is capable of
+ * handling the transmission of the whole buffer automatically.
  *
  * @warning This function exists only because some standard requests are frequently
  * larger than the endpoint 0 size. There's no @c usbd_control_out counterpart, please
@@ -128,8 +128,8 @@ void usbd_control_in(const void *buf, uint16_t buflen, uint16_t reqlen);
 
 /**
  * @name Callbacks
- * Function callbacks that should be implemented by the user to allow the library to
- * interact with the host.
+ * Function callbacks that should be defined by the library consumers when implementing
+ * an USB device firmware.
  *
  * @{
  */
@@ -145,7 +145,7 @@ const usb_device_descriptor_t* usbd_get_device_descriptor_cb(void);
  * @returns A reference to a constant @ref usb_config_descriptor_t.
  *
  * @warning The library supports @b only @b one configuration. That is why the
- * callback should not accept any arguments!
+ * callback does not accept any arguments!
  */
 const usb_config_descriptor_t* usbd_get_config_descriptor_cb(void);
 
@@ -159,7 +159,7 @@ const usb_interface_descriptor_t* usbd_get_interface_descriptor_cb(uint16_t itf)
 /**
  * @brief Required callback to define USB string descriptor.
  * @param[in] lang The 16 bits identifier of the requested language.
- * @param[in] idx  The index of the string descriptor to be returned, as defined in the descriptor.
+ * @param[in] idx  The index of the string descriptor to be returned, as defined by the descriptor.
  * @returns A reference to a constant @ref usb_string_descriptor_t.
  */
 const usb_string_descriptor_t* usbd_get_string_descriptor_cb(uint16_t lang, uint8_t idx);
@@ -175,25 +175,26 @@ void usbd_reset_hook_cb(bool before) __attribute__((weak));
  * @param[in] addr The address assigned by the host.
  *
  * Setting the address is the last step of the device enumeration process. The device can
- * be considered enumerated when this hook is called.
+ * be considered as enumerated by the host when this hook is called.
  */
 void usbd_set_address_hook_cb(uint8_t addr) __attribute__((weak));
 
 /**
  * @brief Optional hook callback for USB SUSPEND requests.
  *
- * This function is responsible to do whatever it needs to do to reduce the power consumption
- * of the device during suspension. The library will enable the internal STM32 low power mode
- * automatically, but that only reduces the consumption of the USB peripheral itself.
+ * This function is responsible for taking any required actions to reduce the power consumption
+ * of the device during suspension. The library will enable the internal STM32 low-power mode
+ * automatically, but this only reduces the consumption of the USB peripheral itself.
  */
 void usbd_suspend_hook_cb(void) __attribute__((weak));
 
 /**
  * @brief Optional hook callback for USB RESUME requests.
  *
- * This function is should re-enable whatever was disabled by the @c usbd_suspend_hook_cb when
- * the device entered suspension. The library will dis]able the internal STM32 low power mode
- * automatically.
+ * This function is responsible for taking any required actions to return the device to normal
+ * execution after a suspension, usually by reversing the actions taken by the
+ * @c usbd_suspend_hook_cb callback when the device entered suspension. The library will disable
+ * the internal STM32 low-power mode automatically.
  */
 void usbd_resume_hook_cb(void) __attribute__((weak));
 
