@@ -23,7 +23,7 @@ A lightweight (and very opinionated) USB FS device stack for STM32.
 
 ## How to use
 
-[API documentation](https://rafaelmartins.eng.br/p/usbd-fs-stm32/api/)
+[API documentation](https://rafaelmartins.com/p/usbd-fs-stm32/api/)
 
 TODO
 
