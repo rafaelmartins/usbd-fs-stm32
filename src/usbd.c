@@ -14,6 +14,7 @@
 #if defined(STM32F0) || defined(STM32F0xx)
 #include <stm32f0xx.h>
 #define USB_COUNT0_RX_BLSIZE        (0x1UL << (15U))
+#define USB_COUNT0_RX_NUM_BLOCK_Pos (10U)
 #define USB_COUNT1_RX_0_COUNT1_RX_0 (0x000003FFU)
 #elif defined(STM32G4) || defined(STM32G4xx)
 #include <stm32g4xx.h>
@@ -166,9 +167,9 @@ pma_init(void)
 
         e->addr = m - ((uint8_t*) USB_PMAADDR);
         if (endpoints[i].size_out > 62)
-            e->cnt = USB_COUNT0_RX_BLSIZE | ((endpoints[i].size_out >> 6) & 0b11111);
+            e->cnt = USB_COUNT0_RX_BLSIZE | (((endpoints[i].size_out >> 6) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos);
         else
-            e->cnt = ((endpoints[i].size_out >> 1) & 0b11111);
+            e->cnt = ((endpoints[i].size_out >> 1) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos;
 
         entry_addr += sizeof(pma_entry_t);
         mem_addr += endpoints[i].size_out;
