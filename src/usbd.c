@@ -206,7 +206,7 @@ usbd_in(uint8_t ept, const void *buf, uint16_t buflen)
 }
 
 uint16_t
-usbd_out(uint8_t ept, void *buf, uint16_t buflen)
+usbd_out(uint8_t ept, void *buf, uint16_t buflen, bool autoenable)
 {
     if (ept >= 8)
         return false;
@@ -219,9 +219,17 @@ usbd_out(uint8_t ept, void *buf, uint16_t buflen)
     rv = (rv > buflen) ? buflen : rv;
     memcpy(buf, (void*) (USB_PMAADDR + e->addr), rv);
 
+    if (autoenable)
+        usbd_out_enable(ept);
+
+    return rv;
+}
+
+void
+usbd_out_enable(uint8_t ept)
+{
     __IO uint16_t *ep = endpoints[ept].reg;
     *ep = (*ep ^ USB_EP_RX_VALID) & (USB_EPREG_MASK | USB_EPRX_STAT);
-    return rv;
 }
 
 
@@ -651,7 +659,7 @@ usbd_task(void)
                 USB->EP0R &= USB_EPREG_MASK ^ USB_EP_CTR_RX;
 
                 usb_ctrl_request_t req;
-                uint16_t len = usbd_out(0, &req, sizeof(usb_ctrl_request_t));
+                uint16_t len = usbd_out(0, &req, sizeof(usb_ctrl_request_t), true);
                 if ((len == sizeof(usb_ctrl_request_t)) && handle_ctrl_setup(&req)) {
                     if ((req.bmRequestType & USB_REQ_DIR_MASK) == USB_REQ_DIR_HOST_TO_DEVICE)
                         usbd_control_in(NULL, 0, req.wLength);

@@ -82,18 +82,15 @@ const usb_string_descriptor_t* usbd_serial_internal_string_descriptor(void);
  * endpoint descriptor via @ref usb_endpoint_descriptor_t. To send larger chunks
  * of data the caller must split the data and call the function multiple times in
  * response to multiple IN requests.
- *
- * Usually if the final chunk of data sent has the same size of the endpoint buffer,
- * a zero length packet must be also transmitted to the host, to inform that the
- * transmission is complete. This is NOT handled automatically by the library.
  */
 bool usbd_in(uint8_t ept, const void *buf, uint16_t buflen);
 
 /**
  * @brief Receive data from the host following a USB OUT request.
- * @param[in]  ept    Endpoint number.
- * @param[out] buf    Pointer to a buffer to receive the data transmitted by the host.
- * @param[in]  buflen Size of the @c buf buffer, in bytes.
+ * @param[in]  ept        Endpoint number.
+ * @param[out] buf        Pointer to a buffer to receive the data transmitted by the host.
+ * @param[in]  buflen     Size of the @c buf buffer, in bytes.
+ * @param[in]  autoenable Re-enable reception after processing the incoming data.
  * @returns The number of bytes received from the host.
  *
  * The buffer should not exceed the size of the endpoint, as defined by the
@@ -101,11 +98,19 @@ bool usbd_in(uint8_t ept, const void *buf, uint16_t buflen);
  * least the same size of the endpoint.
  *
  * Usually the firmware should continue accepting USB OUT requests and receive the
- * data by calling this function while the number of bytes received is equal to the
- * endpoint size. When the number of bytes received is smaller than then endpoint
- * size the reception is completed. This is NOT handled automatically by the library.
+ * data by calling this function if the incoming data is larger than the endpoint
+ * size.
  */
-uint16_t usbd_out(uint8_t ept, void *buf, uint16_t buflen);
+uint16_t usbd_out(uint8_t ept, void *buf, uint16_t buflen, bool autoenable);
+
+/**
+ * @brief Enable data reception from the host.
+ * @param[in] ept Endpoint number.
+ *
+ * This function must be called to re-enable data reception after calling @ref usbd_out
+ * with the @c autoenable argument set to false.
+ */
+void usbd_out_enable(uint8_t ept);
 
 /**
  * @brief Transmit data to the host in response to a CONTROL USB IN request on endpoint 0.
