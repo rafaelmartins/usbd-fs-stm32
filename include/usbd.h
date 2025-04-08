@@ -82,6 +82,9 @@ const usb_string_descriptor_t* usbd_serial_internal_string_descriptor(void);
  * endpoint descriptor via @ref usb_endpoint_descriptor_t. To send larger chunks
  * of data the caller must split the data and call the function multiple times in
  * response to multiple IN requests.
+ *
+ * This function may be called outside of the @ref usbd_in_cb callback, to schedule data
+ * to be transmitted immediately, as long as there's no ongoing transmission.
  */
 bool usbd_in(uint8_t ept, const void *buf, uint16_t buflen);
 

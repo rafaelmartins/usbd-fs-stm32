@@ -182,7 +182,7 @@ pma_init(void)
 bool
 usbd_in(uint8_t ept, const void *buf, uint16_t buflen)
 {
-    if (ept >= 8)
+    if (ept >= 8 || (((*endpoints[ept].reg) & (USB_EPTX_STAT | USB_EPADDR_FIELD)) != (USB_EP_TX_NAK | ept)))
         return false;
 
     __IO pma_entry_t *e = endpoints[ept].pma_in;
@@ -598,7 +598,7 @@ usbd_task(void)
     if (istr == 0)
         return;
 
-    if (istr & USB_ISTR_WKUP) {
+    if ((istr & USB_ISTR_WKUP) == USB_ISTR_WKUP) {
         USB->ISTR &= ~(USB_ISTR_SUSP | USB_ISTR_WKUP);
         USB->CNTR &= ~USB_CNTR_FSUSP;
         if (usbd_resume_hook_cb)
@@ -606,7 +606,7 @@ usbd_task(void)
         return;
     }
 
-    if (istr & USB_ISTR_SUSP) {
+    if ((istr & USB_ISTR_SUSP) == USB_ISTR_SUSP) {
         USB->ISTR &= ~USB_ISTR_SUSP;
         USB->CNTR |= USB_CNTR_FSUSP;
         if (usbd_suspend_hook_cb)
@@ -614,7 +614,7 @@ usbd_task(void)
         return;
     }
 
-    if (istr & USB_ISTR_RESET) {
+    if ((istr & USB_ISTR_RESET) == USB_ISTR_RESET) {
         USB->ISTR &= ~USB_ISTR_RESET;
 
         if (usbd_reset_hook_cb)
@@ -636,22 +636,7 @@ usbd_task(void)
         return;
     }
 
-    static uint8_t current_ep = 1;
-    if (usbd_in_cb && (istr & USB_ISTR_SOF)) {
-        USB->ISTR &= ~USB_ISTR_SOF;
-
-        uint8_t ep = current_ep++;
-        if (current_ep >= 8)
-            current_ep = 1;
-
-        if ((endpoints[ep].size_in != 0) &&
-            (((*endpoints[ep].reg) & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | ep))) {
-            usbd_in_cb(ep);
-            return;
-        }
-    }
-
-    if (istr & USB_ISTR_CTR) {
+    if ((istr & USB_ISTR_CTR) == USB_ISTR_CTR) {
         uint8_t ep = USB->ISTR & USB_ISTR_EP_ID;
 
         if (ep == 0) {
@@ -685,14 +670,51 @@ usbd_task(void)
             }
         }
 
-        if (*(endpoints[ep].reg) & USB_EP_CTR_RX) {
+        if ((*(endpoints[ep].reg) & USB_EP_CTR_RX) == USB_EP_CTR_RX) {
             *(endpoints[ep].reg) &= USB_EPREG_MASK ^ USB_EP_CTR_RX;
             if (usbd_out_cb)
                 usbd_out_cb(ep);
         }
-        if (*(endpoints[ep].reg) & USB_EP_CTR_TX)
+        if ((*(endpoints[ep].reg) & USB_EP_CTR_TX) == USB_EP_CTR_TX) {
             *(endpoints[ep].reg) &= USB_EPREG_MASK ^ USB_EP_CTR_TX;
+            if (usbd_in_cb &&
+                (((*endpoints[ep].reg) & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | ep)))
+                usbd_in_cb(ep);
+        }
     }
+
+    if ((!usbd_in_cb) || (istr & USB_ISTR_SOF) != USB_ISTR_SOF)
+        return;
+    USB->ISTR &= ~USB_ISTR_SOF;
+
+#if USBD_EP1_IN_SIZE > 0
+    if ((USB->EP1R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 1))
+        usbd_in_cb(1);
+#endif
+#if USBD_EP2_IN_SIZE > 0
+    if ((USB->EP2R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 2))
+        usbd_in_cb(2);
+#endif
+#if USBD_EP3_IN_SIZE > 0
+    if ((USB->EP3R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 3))
+        usbd_in_cb(3);
+#endif
+#if USBD_EP4_IN_SIZE > 0
+    if ((USB->EP4R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 4))
+        usbd_in_cb(4);
+#endif
+#if USBD_EP5_IN_SIZE > 0
+    if ((USB->EP5R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 5))
+        usbd_in_cb(5);
+#endif
+#if USBD_EP6_IN_SIZE > 0
+    if ((USB->EP6R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 6))
+        usbd_in_cb(6);
+#endif
+#if USBD_EP7_IN_SIZE > 0
+    if ((USB->EP7R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 7))
+        usbd_in_cb(7);
+#endif
 }
 
 
