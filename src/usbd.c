@@ -585,7 +585,7 @@ usbd_init(void)
 
     USB->ISTR = 0;
     USB->CNTR = USB_CNTR_CTRM | USB_CNTR_WKUPM | USB_CNTR_SUSPM | USB_CNTR_RESETM;
-    if (usbd_in_cb)
+    if (usbd_in_cb || usbd_sof_cb)
         USB->CNTR |= USB_CNTR_SOFM;
     USB->BCDR = USB_BCDR_DPPU;
 }
@@ -683,9 +683,15 @@ usbd_task(void)
         }
     }
 
-    if ((!usbd_in_cb) || (istr & USB_ISTR_SOF) != USB_ISTR_SOF)
+    if ((istr & USB_ISTR_SOF) != USB_ISTR_SOF)
         return;
     USB->ISTR &= ~USB_ISTR_SOF;
+
+    if (usbd_sof_cb)
+        usbd_sof_cb();
+
+    if (!usbd_in_cb)
+        return;
 
 #if USBD_EP1_IN_SIZE > 0
     if ((USB->EP1R & (USB_EPTX_STAT | USB_EPADDR_FIELD)) == (USB_EP_TX_NAK | 1))

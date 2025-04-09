@@ -219,6 +219,11 @@ void usbd_out_cb(uint8_t ept) __attribute__((weak));
 void usbd_in_cb(uint8_t ept) __attribute__((weak));
 
 /**
+ * @brief Optional callback for USB SOF packets.
+ */
+void usbd_sof_cb(void) __attribute__((weak));
+
+/**
  * @brief Optional callback for USB CONTROL class requests.
  * @param[in] req A reference to a @ref usb_ctrl_request_t.
  */
