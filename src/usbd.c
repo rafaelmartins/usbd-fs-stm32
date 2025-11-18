@@ -567,13 +567,13 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
 void
 usbd_init(void)
 {
-#ifdef STM32F0
+#if defined(STM32F0) || defined(STM32F0xx)
     RCC->APB1ENR |= RCC_APB1ENR_USBEN;
     RCC->APB1RSTR |= RCC_APB1RSTR_USBRST;
     RCC->APB1RSTR &= ~RCC_APB1RSTR_USBRST;
 #endif
 
-#ifdef STM32G4
+#if defined(STM32G4) || defined(STM32G4xx)
     RCC->APB1ENR1 |= RCC_APB1ENR1_USBEN;
     RCC->APB1RSTR1 |= RCC_APB1RSTR1_USBRST;
     RCC->APB1RSTR1 &= ~RCC_APB1RSTR1_USBRST;
