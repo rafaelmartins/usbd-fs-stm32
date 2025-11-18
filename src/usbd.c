@@ -1,29 +1,64 @@
 /*
  * usbd-fs-stm32: A lightweight (and very opinionated) USB FS device stack for STM32.
  *
- * SPDX-FileCopyrightText: 2024 Rafael G. Martins <rafael@rafaelmartins.eng.br>
+ * SPDX-FileCopyrightText: 2024-2025 Rafael G. Martins <rafael@rafaelmartins.eng.br>
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <stdbool.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <usbd.h>
 
-#if defined(STM32F0) || defined(STM32F0xx)
+#if defined(STM32C0) || defined(STM32C0xx)
+#include <stm32c0xx.h>
+#define USB_PMA_SIZE 2048
+#define USB_PMA_TYPE uint32_t
+#elif defined(STM32F0) || defined(STM32F0xx)
 #include <stm32f0xx.h>
-#define USB_COUNT0_RX_BLSIZE        (0x1UL << (15U))
-#define USB_COUNT0_RX_NUM_BLOCK_Pos (10U)
-#define USB_COUNT1_RX_0_COUNT1_RX_0 (0x000003FFU)
+#define USB_PMA_SIZE 1024
+#define USB_PMA_TYPE uint16_t
+#elif defined(STM32G0) || defined(STM32G0xx)
+#include <stm32g0xx.h>
+#define USB_PMA_SIZE 2048
+#define USB_PMA_TYPE uint32_t
 #elif defined(STM32G4) || defined(STM32G4xx)
 #include <stm32g4xx.h>
+#define USB_PMA_SIZE 1024
+#define USB_PMA_TYPE uint16_t
 #else
 #error "Unsupported STM32 series"
 #endif
 
 #ifndef USB
+#ifdef USB_DRD_FS
+#define USB USB_DRD_FS
+#define USB_PMAADDR USB_DRD_PMAADDR
+#define EP0R CHEP0R
+#define EP1R CHEP1R
+#define EP2R CHEP2R
+#define EP3R CHEP3R
+#define EP4R CHEP4R
+#define EP5R CHEP5R
+#define EP6R CHEP6R
+#define EP7R CHEP7R
+#define USB_EPRX_STAT USB_EP_RX_STRX
+#define USB_EPTX_STAT USB_EP_TX_STTX
+#define USB_EP_CTR_RX USB_CHEP_VTRX
+#define USB_EP_CTR_TX USB_CHEP_VTTX
+#define USB_EPADDR_FIELD USB_CHEP_ADDR
+#define USB_EPREG_MASK USB_CHEP_REG_MASK
+#define USB_CNTR_FSUSP USB_CNTR_SUSPEN
+#define USB_ISTR_EP_ID USB_ISTR_IDN
+#else
 #error "No supported USB device available"
+#endif
+#endif
+
+#ifndef USB_COUNT0_RX_BLSIZE
+#define USB_COUNT0_RX_BLSIZE        (0x1UL << (15U))
+#define USB_COUNT0_RX_NUM_BLOCK_Pos (10U)
+#define USB_COUNT1_RX_0_COUNT1_RX_0 (0x000003FFU)
 #endif
 
 #ifndef USBD_EP1_IN_SIZE
@@ -94,40 +129,40 @@
 #if (USBD_EP1_IN_SIZE + USBD_EP1_OUT_SIZE + USBD_EP2_IN_SIZE + USBD_EP2_OUT_SIZE + \
      USBD_EP3_IN_SIZE + USBD_EP3_OUT_SIZE + USBD_EP4_IN_SIZE + USBD_EP4_OUT_SIZE + \
      USBD_EP5_IN_SIZE + USBD_EP5_OUT_SIZE + USBD_EP6_IN_SIZE + USBD_EP6_OUT_SIZE + \
-     USBD_EP7_IN_SIZE + USBD_EP7_OUT_SIZE) > (1024 - 64 - USBD_EP0_SIZE - USBD_EP0_SIZE)
+     USBD_EP7_IN_SIZE + USBD_EP7_OUT_SIZE) > (USB_PMA_SIZE - 64 - USBD_EP0_SIZE - USBD_EP0_SIZE)
 #error "Unsupported endpoint configuration, not enough USB SRAM available"
 #endif
 
-typedef struct {
-    __IOM uint16_t addr;
-    __IOM uint16_t cnt;
-} __ALIGNED(2) pma_entry_t;
+typedef __PACKED_STRUCT {
+    uint16_t addr;
+    uint16_t cnt;
+} pma_entry_t;
 
 static struct {
     uint16_t type;
     __IOM uint16_t* reg;
-    __IOM pma_entry_t* pma_in;
-    __IOM pma_entry_t* pma_out;
+    uint32_t pma_in;
+    uint32_t pma_out;
     uint8_t size_in;
     uint8_t size_out;
 } endpoints[] = {
     {
         .type     = USB_EP_CONTROL,
         .reg      = (__IOM uint16_t*) &(USB->EP0R),
-        .pma_in   = (__IOM pma_entry_t*) USB_PMAADDR,
-        .pma_out  = (__IOM pma_entry_t*) (USB_PMAADDR + sizeof(pma_entry_t)),
+        .pma_in   = USB_PMAADDR,
+        .pma_out  = USB_PMAADDR + sizeof(pma_entry_t),
         .size_in  = USBD_EP0_SIZE,
         .size_out = USBD_EP0_SIZE,
     },
 
-#define __endpoint(EPT, TYP)                                                               \
-    {                                                                                      \
-        .type     = USB_EP_ ## TYP,                                                        \
-        .reg      = (__IOM uint16_t*) &(USB->EP ## EPT ## R),                              \
-        .pma_in   = (__IOM pma_entry_t*) (USB_PMAADDR + (EPT << 3)),                       \
-        .pma_out  = (__IOM pma_entry_t*) (USB_PMAADDR + (EPT << 3) + sizeof(pma_entry_t)), \
-        .size_in  = USBD_EP ## EPT ## _IN_SIZE,                                            \
-        .size_out = USBD_EP ## EPT ## _OUT_SIZE,                                           \
+#define __endpoint(EPT, TYP)                                        \
+    {                                                               \
+        .type     = USB_EP_ ## TYP,                                 \
+        .reg      = (__IOM uint16_t*) &(USB->EP ## EPT ## R),       \
+        .pma_in   = USB_PMAADDR + (EPT << 3),                       \
+        .pma_out  = USB_PMAADDR + (EPT << 3) + sizeof(pma_entry_t), \
+        .size_in  = USBD_EP ## EPT ## _IN_SIZE,                     \
+        .size_out = USBD_EP ## EPT ## _OUT_SIZE,                    \
     }
 #define _endpoint(EPT, TYP) __endpoint(EPT, TYP)
 #define endpoint(EPT)       _endpoint(EPT, USBD_EP ## EPT ## _TYPE)
@@ -147,35 +182,76 @@ static struct {
 
 
 static void
+pma_read(uint32_t addr, void *buf, uint16_t len)
+{
+    __IO USB_PMA_TYPE *src = (USB_PMA_TYPE*) addr;
+    USB_PMA_TYPE *dst = (USB_PMA_TYPE*) buf;
+
+    uint16_t ch = len / sizeof(USB_PMA_TYPE);
+    for (uint16_t c = 0; c < ch; c++)
+        *(dst++) = *(src++);
+
+    uint8_t r = len % sizeof(USB_PMA_TYPE);
+    if (r == 0)
+        return;
+
+    uint8_t *dstb = (uint8_t*) dst;
+    for (uint8_t b = 0; b < r; b++)
+        *(dstb++) = *(src++);
+}
+
+static void
+pma_write(uint32_t addr, const void *buf, uint16_t len)
+{
+    const USB_PMA_TYPE *src = (const USB_PMA_TYPE*) buf;
+    __IO USB_PMA_TYPE *dst = (USB_PMA_TYPE*) addr;
+
+    uint16_t ch = len / sizeof(USB_PMA_TYPE);
+    for (uint16_t c = 0; c < ch; c++)
+        *(dst++) = *(src++);
+
+    uint8_t r = len % sizeof(USB_PMA_TYPE);
+    if (r == 0)
+        return;
+
+    uint8_t *srcb = (uint8_t*) src;
+    USB_PMA_TYPE dstv = 0;
+    uint8_t *dstb = (uint8_t*) &dstv;
+    for (uint8_t b = 0; b < r; b++)
+        *(dstb++) = *(srcb++);
+    *dst = dstv;
+}
+
+static void
 pma_init(void)
 {
     uint32_t entry_addr = USB_PMAADDR;
-    uint32_t mem_addr = USB_PMAADDR + 16 * sizeof(pma_entry_t);  // right after entry table
+    uint32_t mem_addr = 16 * sizeof(pma_entry_t);  // right after entry table
 
     for (uint8_t i = 0; i < 8; i++) {
-        pma_entry_t *e = (pma_entry_t*) entry_addr;
-        uint8_t *m = (uint8_t*) mem_addr;
-
-        e->addr = m - ((uint8_t*) USB_PMAADDR);
-        e->cnt = 0;
+        pma_entry_t e = {
+            .addr = mem_addr,
+            .cnt = 0,
+        };
+        pma_write(entry_addr, &e, sizeof(pma_entry_t));
 
         entry_addr += sizeof(pma_entry_t);
         mem_addr += endpoints[i].size_in;
 
-        e = (pma_entry_t*) entry_addr;
-        m = (uint8_t*) mem_addr;
-
-        e->addr = m - ((uint8_t*) USB_PMAADDR);
+        e.addr = mem_addr;
         if (endpoints[i].size_out > 62)
-            e->cnt = USB_COUNT0_RX_BLSIZE | (((endpoints[i].size_out >> 6) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos);
+            e.cnt = USB_COUNT0_RX_BLSIZE | (((endpoints[i].size_out >> 6) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos);
         else
-            e->cnt = ((endpoints[i].size_out >> 1) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos;
+            e.cnt = ((endpoints[i].size_out >> 1) & 0b11111) << USB_COUNT0_RX_NUM_BLOCK_Pos;
+        pma_write(entry_addr, &e, sizeof(pma_entry_t));
 
         entry_addr += sizeof(pma_entry_t);
         mem_addr += endpoints[i].size_out;
     }
 
+#ifdef USB_BTABLE
     USB->BTABLE = 0;
+#endif
 }
 
 
@@ -185,20 +261,16 @@ usbd_in(uint8_t ept, const void *buf, uint16_t buflen)
     if (ept >= 8 || (((*endpoints[ept].reg) & (USB_EPTX_STAT | USB_EPADDR_FIELD)) != (USB_EP_TX_NAK | ept)))
         return false;
 
-    __IO pma_entry_t *e = endpoints[ept].pma_in;
-    if (e->addr == 0)
+    pma_entry_t e;
+    pma_read(endpoints[ept].pma_in, &e, sizeof(pma_entry_t));
+
+    if (e.addr == 0)
         return false;
 
-    const uint8_t *src = buf;
-    __IO uint16_t *dst = (uint16_t*) (USB_PMAADDR + e->addr);
+    e.cnt = buflen;
 
-    uint16_t tmp;
-    for (uint16_t i = 0; i < ((buflen + 1) >> 1); i++) {
-        tmp = *(src++);
-        tmp |= (((uint16_t) *(src++)) << 8);
-        *(dst++) = tmp;
-    }
-    e->cnt = buflen;
+    pma_write(USB_PMAADDR + e.addr, buf, buflen);
+    pma_write(endpoints[ept].pma_in, &e, sizeof(pma_entry_t));
 
     __IO uint16_t *ep = endpoints[ept].reg;
     *ep = (*ep ^ USB_EP_TX_VALID) & (USB_EPREG_MASK | USB_EPTX_STAT);
@@ -211,13 +283,16 @@ usbd_out(uint8_t ept, void *buf, uint16_t buflen, bool autoenable)
     if (ept >= 8)
         return false;
 
-    __IO pma_entry_t *e = endpoints[ept].pma_out;
-    if (e->addr == 0)
-        return 0;
+    pma_entry_t e;
+    pma_read(endpoints[ept].pma_out, &e, sizeof(pma_entry_t));
 
-    uint16_t rv = e->cnt & USB_COUNT1_RX_0_COUNT1_RX_0;
+    if (e.addr == 0)
+        return false;
+
+    uint16_t rv = e.cnt & USB_COUNT1_RX_0_COUNT1_RX_0;
     rv = (rv > buflen) ? buflen : rv;
-    memcpy(buf, (void*) (USB_PMAADDR + e->addr), rv);
+
+    pma_read(USB_PMAADDR + e.addr, buf, buflen);
 
     if (autoenable)
         usbd_out_enable(ept);
@@ -567,10 +642,22 @@ handle_ctrl_setup(usb_ctrl_request_t *req)
 void
 usbd_init(void)
 {
+#if defined(STM32C0) || defined(STM32C0xx)
+    RCC->APBENR1 |= RCC_APBENR1_USBEN;
+    RCC->APBRSTR1 |= RCC_APBRSTR1_USBRST;
+    RCC->APBRSTR1 &= ~RCC_APBRSTR1_USBRST;
+#endif
+
 #if defined(STM32F0) || defined(STM32F0xx)
     RCC->APB1ENR |= RCC_APB1ENR_USBEN;
     RCC->APB1RSTR |= RCC_APB1RSTR_USBRST;
     RCC->APB1RSTR &= ~RCC_APB1RSTR_USBRST;
+#endif
+
+#if defined(STM32G0) || defined(STM32G0xx)
+    RCC->APBENR1 |= RCC_APBENR1_USBEN;
+    RCC->APBRSTR1 |= RCC_APBRSTR1_USBRST;
+    RCC->APBRSTR1 &= ~RCC_APBRSTR1_USBRST;
 #endif
 
 #if defined(STM32G4) || defined(STM32G4xx)

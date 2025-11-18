@@ -6,7 +6,9 @@ A lightweight (and very opinionated) USB FS device stack for STM32.
 
 ### Supporded STM32 Series
 
+- `STM32C0`
 - `STM32F0`
+- `STM32G0`
 - `STM32G4`
 
 ### USB Endpoint types
