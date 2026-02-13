@@ -1,34 +1,5 @@
 # usbd-fs-stm32
 
-A lightweight (and very opinionated) USB FS device stack for STM32.
+A lightweight and opinionated USB Full-Speed device stack for STM32 microcontrollers.
 
-## Supported features
-
-### Supporded STM32 Series
-
-- `STM32C0`
-- `STM32F0`
-- `STM32G0`
-- `STM32G4`
-
-### USB Endpoint types
-
-- `CONTROL` (Endpoint 0 only, 64 bytes `bMaxPacketSize0`)
-- `BULK` (Single-buffered only)
-- `INTERRUPT`
-
-### Limitations
-
-- Only one configuration possible.
-- No interface alternate setting possible.
-
-
-## How to use
-
-[API documentation](https://rafaelmartins.com/p/usbd-fs-stm32/api/)
-
-TODO
-
-
-## License
-This code is released under a [BSD 3-Clause License](LICENSE).
+For documentation please visit: https://rafaelmartins.com/p/usbd-fs-stm32/
