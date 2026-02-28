@@ -9,7 +9,7 @@ usbd-fs-stm32 is a bare-metal C library that implements a USB Full-Speed device 
 
 Firmware authors define a set of callbacks to provide USB descriptors and handle data transfers. The library takes care of the rest: PMA (Packet Memory Area) buffer management, control transfer state machine, endpoint configuration, and low-power mode transitions.
 
-## Key Highlights
+## Key highlights
 
 - **No HAL dependency** -- operates directly on CMSIS device headers and USB peripheral registers
 - **Callback architecture** -- firmware implements descriptor callbacks and data transfer handlers; the library handles all standard USB protocol logic
@@ -36,8 +36,8 @@ Up to 8 endpoints (0--7) are available, with endpoint 0 always reserved for cont
 - No interface alternate settings.
 - No isochronous endpoint support.
 
-## Explore Further
+## Explore further
 
-- [Firmware Development](10_firmware-development.md) -- integration, configuration, and usage guide
+- [Firmware development](10_firmware-development.md) -- integration, configuration, and usage guide
 - [API documentation](@@/p/usbd-fs-stm32/api/) -- function signatures, callbacks, and descriptor types
-- [Source Code](https://github.com/rafaelmartins/usbd-fs-stm32) -- GitHub repository
+- [Source code](https://github.com/rafaelmartins/usbd-fs-stm32) -- GitHub repository
